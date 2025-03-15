@@ -28,8 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['usuario_id']
     ]);
     
-    header("Location: ?pagina=transacoes");
+    $_SESSION['mensagem'] = "Transação salva com sucesso!";
+    header("Location: index.php?pagina=transacoes");
     exit;
+}
+
+if (isset($_SESSION['mensagem'])) {
+    echo '<div class="alert alert-success">' . $_SESSION['mensagem'] . '</div>';
+    unset($_SESSION['mensagem']);
 }
 ?>
 
@@ -112,20 +118,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt = $pdo->prepare("
                     SELECT * FROM transacoes 
                     WHERE usuario_id = ? 
-                    ORDER BY data_transacao DESC 
+                    ORDER BY data_transacao DESC, id DESC 
                     LIMIT 10
                 ");
                 $stmt->execute([$_SESSION['usuario_id']]);
-                while ($row = $stmt->fetch()) {
-                    echo "<tr>";
-                    echo "<td>" . date('d/m/Y', strtotime($row['data_transacao'])) . "</td>";
-                    echo "<td>" . ucfirst($row['tipo']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['tipo_servico']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['descricao']) . "</td>";
-                    echo "<td>R$ " . number_format($row['valor'], 2, ',', '.') . "</td>";
-                    echo "<td>" . htmlspecialchars($row['forma_pagamento']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['nota_fiscal']) . "</td>";
-                    echo "</tr>";
+                $transacoes = $stmt->fetchAll();
+                
+                if (count($transacoes) > 0) {
+                    foreach ($transacoes as $row) {
+                        echo "<tr>";
+                        echo "<td>" . date('d/m/Y', strtotime($row['data_transacao'])) . "</td>";
+                        echo "<td>" . ucfirst($row['tipo']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['tipo_servico']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['descricao']) . "</td>";
+                        echo "<td>R$ " . number_format($row['valor'], 2, ',', '.') . "</td>";
+                        echo "<td>" . htmlspecialchars($row['forma_pagamento']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['nota_fiscal']) . "</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='7' class='text-center'>Nenhuma transação encontrada</td></tr>";
                 }
                 ?>
             </tbody>

@@ -31,3 +31,7 @@ CREATE TABLE IF NOT EXISTS transacoes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
+
+INSERT INTO usuarios (usuario, senha) 
+VALUES ('seu_usuario', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
+-- A senha é 'password', você deve alterá-la após o primeiro login
